@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Utilisateurs</title>
+</head>
+<body>
+<h1>Utilisateurs</h1>
+
+<p th:if="${message}" th:text="${message}"></p>
+<p th:if="${erreur}" th:text="${erreur}"></p>
+
+<p><a th:href="@{/admin/utilisateurs/nouveau}">Créer un utilisateur</a></p>
+
+<table border="1">
+    <thead>
+    <tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="u : ${utilisateurs}">
+        <td th:text="${u.nom}">Nom</td>
+        <td th:text="${u.email}">email</td>
+        <td th:text="${u.role}">USER</td>
+        <td>
+            <a th:href="@{/admin/utilisateurs/{id}(id=${u.id})}">Détail</a>
+            <a th:href="@{/admin/utilisateurs/{id}/modifier(id=${u.id})}">Modifier</a>
+            <form th:action="@{/admin/utilisateurs/{id}/supprimer(id=${u.id})}" method="post"
+                  style="display:inline" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                <button type="submit">Supprimer</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<p><a th:href="@{/}">Accueil</a></p>
+</body>
+</html>

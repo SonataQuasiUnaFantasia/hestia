@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail de l'utilisateur</title>
+</head>
+<body>
+<h1>Détail de l'utilisateur</h1>
+
+<p th:if="${message}" th:text="${message}"></p>
+
+<dl>
+    <dt>Id</dt><dd th:text="${utilisateur.id}">1</dd>
+    <dt>Nom</dt><dd th:text="${utilisateur.nom}">Nom</dd>
+    <dt>Email</dt><dd th:text="${utilisateur.email}">email</dd>
+    <dt>Rôle</dt><dd th:text="${utilisateur.role}">USER</dd>
+    <dt>Mot de passe défini</dt><dd th:text="${utilisateur.motDePasse != null} ? 'oui' : 'non'">oui</dd>
+</dl>
+
+<p>
+    <a th:href="@{/admin/utilisateurs/{id}/modifier(id=${utilisateur.id})}">Modifier</a>
+    <a th:href="@{/admin/utilisateurs}">Retour à la liste</a>
+</p>
+</body>
+</html>

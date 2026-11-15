@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${id == null} ? 'Créer un utilisateur' : 'Modifier un utilisateur'">Utilisateur</title>
+</head>
+<body>
+<h1 th:text="${id == null} ? 'Créer un utilisateur' : 'Modifier un utilisateur'">Utilisateur</h1>
+
+<form th:action="${id == null} ? @{/admin/utilisateurs} : @{/admin/utilisateurs/{id}(id=${id})}"
+      th:object="${utilisateurForm}" method="post">
+
+    <ul th:if="${#fields.hasGlobalErrors()}">
+        <li th:each="e : ${#fields.globalErrors()}" th:text="${e}"></li>
+    </ul>
+
+    <p>
+        <label for="nom">Nom</label><br>
+        <input type="text" id="nom" th:field="*{nom}" maxlength="50">
+        <span th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}"></span>
+    </p>
+    <p>
+        <label for="email">Email</label><br>
+        <input type="email" id="email" th:field="*{email}" maxlength="255">
+        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+    </p>
+    <p>
+        <label for="motDePasse">Mot de passe</label>
+        <span th:if="${id != null}">(laisser vide pour ne pas le changer)</span><br>
+        <input type="password" id="motDePasse" name="motDePasse" autocomplete="new-password">
+        <span th:if="${#fields.hasErrors('motDePasse')}" th:errors="*{motDePasse}"></span>
+    </p>
+    <p>
+        <label for="role">Rôle</label><br>
+        <select id="role" th:field="*{role}">
+            <option th:each="r : ${roles}" th:value="${r}" th:text="${r}">USER</option>
+        </select>
+        <span th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></span>
+    </p>
+
+    <button type="submit">Enregistrer</button>
+    <a th:href="@{/admin/utilisateurs}">Annuler</a>
+</form>
+</body>
+</html>

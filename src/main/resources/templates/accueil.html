@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Accueil</title>
+</head>
+<body>
+<h1>Accueil</h1>
+<p>Bonjour <span th:text="${utilisateur.nom}">Nom</span>.</p>
+
+<ul>
+    <li><a th:href="@{/profil}">Mon profil</a></li>
+    <li th:if="${utilisateur.role.name() == 'ADMIN'}">
+        <a th:href="@{/admin/utilisateurs}">Gestion des utilisateurs</a>
+    </li>
+</ul>
+
+<form th:action="@{/logout}" method="post">
+    <button type="submit">Se déconnecter</button>
+</form>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion</title>
+</head>
+<body>
+<h1>Connexion</h1>
+
+<p th:if="${param.error}">Identifiants incorrects.</p>
+<p th:if="${param.logout}">Vous avez été déconnecté.</p>
+
+<form th:action="@{/login}" method="post">
+    <p>
+        <label for="email">Email</label><br>
+        <input type="email" id="email" name="email" required autofocus>
+    </p>
+    <p>
+        <label for="motDePasse">Mot de passe</label><br>
+        <input type="password" id="motDePasse" name="motDePasse" required>
+    </p>
+    <button type="submit">Se connecter</button>
+</form>
+</body>
+</html>
