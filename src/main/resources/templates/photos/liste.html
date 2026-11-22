@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Photos</title>
+</head>
+<body>
+<h1>Photos</h1>
+
+<p th:if="${message}" th:text="${message}"></p>
+
+<p><a th:href="@{/photos/envoi}">Publier des photos</a></p>
+
+<p th:if="${photos.isEmpty()}">Aucune photo pour le moment.</p>
+
+<figure th:each="p : ${photos.content}" th:id="'photo-' + ${p.id}">
+    <img th:src="@{/photos/{id}/image(id=${p.id})}" th:width="${p.largeur}" th:height="${p.hauteur}"
+         th:alt="|Photo publiée par ${p.auteur}|">
+    <figcaption>
+        <span th:text="${p.auteur}">Auteur</span>,
+        <time th:datetime="${p.dateCreation}"
+              th:text="${#temporals.format(p.dateCreation, 'dd/MM/yyyy HH:mm')}">01/01/2026 12:00</time>
+        <form th:if="${p.supprimable}" th:action="@{/photos/{id}/supprimer(id=${p.id})}" method="post"
+              onsubmit="return confirm('Supprimer cette photo ?');">
+            <button type="submit">Supprimer</button>
+        </form>
+    </figcaption>
+</figure>
+
+<p>
+    <a th:if="${photos.hasPrevious()}" th:href="@{/photos(page=${photos.number - 1})}">Photos plus récentes</a>
+    <a th:if="${photos.hasNext()}" th:href="@{/photos(page=${photos.number + 1})}">Photos plus anciennes</a>
+</p>
+
+<p><a th:href="@{/}">Accueil</a></p>
+</body>
+</html>
