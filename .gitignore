@@ -1,0 +1,76 @@
+HELP.md
+claude.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Configuration locale (identifiants) ###
+application-local.properties
+!.mvn/wrapper/maven-wrapper.properties
+
+### Secrets et configuration locale ###
+application-local.*
+application-*-local.*
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+
+### Java / logs / crash ###
+*.class
+*.log
+logs/
+hs_err_pid*
+replay_pid*
+*.jar
+*.war
+*.ear
+!.mvn/wrapper/maven-wrapper.jar
+
+### Données locales (BDD, dumps, uploads) ###
+*.mv.db
+*.trace.db
+*.sql.gz
+dump*.sql
+uploads/
+
+### Éditeurs / OS ###
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.vscode/
+.claude/settings.local.json

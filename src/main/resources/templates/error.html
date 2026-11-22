@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Erreur</title>
+</head>
+<body>
+<h1>Une erreur est survenue</h1>
+<p th:switch="${status}">
+    <span th:case="403">Accès refusé.</span>
+    <span th:case="404">Page introuvable.</span>
+    <span th:case="*">Erreur inattendue.</span>
+</p>
+<p><a th:href="@{/}">Accueil</a></p>
+</body>
+</html>
