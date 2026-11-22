@@ -61,6 +61,25 @@
 			<artifactId>flyway-mysql</artifactId>
 		</dependency>
 
+		<!-- Publications photo : redimensionnement / encodage JPEG des versions optimisees. -->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>0.4.21</version>
+		</dependency>
+		<!-- Lecture de l'orientation EXIF des photos (telephones). -->
+		<dependency>
+			<groupId>com.drewnoakes</groupId>
+			<artifactId>metadata-extractor</artifactId>
+			<version>2.19.0</version>
+		</dependency>
+		<!-- Decodage WebP (ni le JDK ni Thumbnailator ne lisent ce format). Lecture seule. -->
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-webp</artifactId>
+			<version>3.15.3</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
@@ -144,6 +163,16 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+
+				<configuration>
+					<configFiles>
+						<configFile>${project.basedir}/flyway.conf</configFile>
+					</configFiles>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

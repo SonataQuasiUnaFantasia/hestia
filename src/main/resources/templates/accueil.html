@@ -10,6 +10,7 @@
 
 <ul>
     <li><a th:href="@{/profil}">Mon profil</a></li>
+    <li><a th:href="@{/photos}">Photos</a></li>
     <li th:if="${utilisateur.role.name() == 'ADMIN'}">
         <a th:href="@{/admin/utilisateurs}">Gestion des utilisateurs</a>
     </li>

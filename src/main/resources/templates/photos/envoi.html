@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>Publier des photos</title>
+</head>
+<body>
+<h1>Publier des photos</h1>
+
+<noscript><p>JavaScript doit être activé pour envoyer des photos.</p></noscript>
+
+<p>
+    <label for="fichiers">Photos (JPEG, PNG ou WebP, <span th:text="${tailleMax / 1048576}">15</span> Mo
+        maximum chacune)</label><br>
+    <input type="file" id="fichiers" multiple accept="image/jpeg,image/png,image/webp"
+           th:data-url="@{/photos}" th:data-taille-max="${tailleMax}">
+</p>
+<p><button type="button" id="envoyer" disabled>Publier</button></p>
+
+<div id="suivi" hidden>
+    <p id="decompte" aria-live="polite"></p>
+    <progress id="progression" max="1" value="0"></progress>
+    <ul id="erreurs"></ul>
+</div>
+
+<p><a th:href="@{/photos}">Voir les photos</a></p>
+
+<script>
+    // Envoi par lot, inspiré du plugin XHRUpload d'Uppy (github.com/transloadit/uppy) :
+    // une requête par fichier, XMLHttpRequest pour suivre la progression de l'envoi (fetch ne l'expose pas),
+    // file d'attente séquentielle, abandon d'un envoi bloqué, et un échec n'interrompt pas les suivants.
+    // Les contrôles faits ici évitent des envois inutiles ; le serveur reste l'autorité.
+    (() => {
+        const champ = document.getElementById('fichiers');
+        const bouton = document.getElementById('envoyer');
+        const suivi = document.getElementById('suivi');
+        const decompte = document.getElementById('decompte');
+        const barre = document.getElementById('progression');
+        const erreurs = document.getElementById('erreurs');
+        const url = champ.dataset.url;
+        const tailleMax = Number(champ.dataset.tailleMax);
+        const jeton = document.querySelector('meta[name="_csrf"]').content;
+        const enTeteJeton = document.querySelector('meta[name="_csrf_header"]').content;
+        const DELAI_BLOCAGE_MS = 30000; // sans progression pendant ce délai, l'envoi est abandonné
+
+        champ.addEventListener('change', () => {
+            bouton.disabled = champ.files.length === 0;
+        });
+
+        bouton.addEventListener('click', async () => {
+            const fichiers = [...champ.files];
+            champ.disabled = bouton.disabled = true;
+            erreurs.replaceChildren();
+            suivi.hidden = false;
+
+            let traitees = 0;
+            let publiees = 0;
+            // La barre avance d'une part par image, et à l'intérieur de cette part selon les octets envoyés.
+            const afficher = (partEnCours = 0) => {
+                decompte.textContent = `${traitees} / ${fichiers.length} image(s) traitée(s)`;
+                barre.value = (traitees + partEnCours) / fichiers.length;
+            };
+            afficher();
+
+            for (const fichier of fichiers) {
+                try {
+                    if (fichier.size > tailleMax) {
+                        throw new Error('le fichier dépasse la taille maximale autorisée');
+                    }
+                    await envoyer(fichier, afficher);
+                    publiees++;
+                } catch (e) {
+                    const ligne = document.createElement('li');
+                    ligne.textContent = `${fichier.name} : ${e.message}`;
+                    erreurs.append(ligne);
+                }
+                traitees++;
+                afficher();
+            }
+
+            decompte.textContent += ` — ${publiees} publiée(s), ${fichiers.length - publiees} refusée(s)`;
+            champ.value = '';
+            champ.disabled = false;
+        });
+
+        /** Envoie une image ; résout avec la réponse du serveur, rejette avec un message lisible. */
+        function envoyer(fichier, surProgression) {
+            return new Promise((resoudre, rejeter) => {
+                const xhr = new XMLHttpRequest();
+                let minuteur;
+                const surveiller = () => {
+                    clearTimeout(minuteur);
+                    minuteur = setTimeout(() => xhr.abort(), DELAI_BLOCAGE_MS);
+                };
+
+                xhr.open('POST', url);
+                xhr.responseType = 'json';
+                xhr.setRequestHeader('Accept', 'application/json');
+                xhr.setRequestHeader(enTeteJeton, jeton);
+                xhr.upload.onprogress = e => {
+                    if (!e.lengthComputable) {
+                        surveiller();
+                        return;
+                    }
+                    surProgression(e.loaded / e.total);
+                    // Octets tous envoyés : le serveur traite l'image, ce n'est plus un blocage réseau.
+                    e.loaded < e.total ? surveiller() : clearTimeout(minuteur);
+                };
+                xhr.onload = () => {
+                    clearTimeout(minuteur);
+                    // Une session expirée renvoie vers la page de connexion (HTML) : seul un 201 avec un id vaut succès.
+                    if (xhr.status === 201 && xhr.response && xhr.response.id) {
+                        resoudre(xhr.response);
+                    } else {
+                        rejeter(new Error(motif(xhr)));
+                    }
+                };
+                xhr.onerror = () => {
+                    clearTimeout(minuteur);
+                    rejeter(new Error('connexion interrompue'));
+                };
+                xhr.onabort = () => rejeter(new Error('envoi bloqué, abandonné'));
+
+                const donnees = new FormData();
+                donnees.append('image', fichier);
+                surveiller();
+                xhr.send(donnees);
+            });
+        }
+
+        function motif(xhr) {
+            if (xhr.response && xhr.response.erreur) {
+                return xhr.response.erreur;
+            }
+            switch (xhr.status) {
+                case 413: return 'le fichier dépasse la taille maximale autorisée';
+                case 200: case 401: case 403: return 'session expirée, reconnectez-vous puis réessayez';
+                default: return `erreur du serveur (${xhr.status})`;
+            }
+        }
+    })();
+</script>
+</body>
+</html>
